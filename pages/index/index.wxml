@@ -1,0 +1,11 @@
+<!-- pages/index/index.wxml -->
+
+<view >
+  <swiper indicator-dots="{{indicatorDots}}" autoplay="{{autoplay}}" circular="{{circular}}" vertical="{{vertical}}" interval="{{interval}}" duration="{{duration}}" previous-margin="{{previousMargin}}px" next-margin="{{nextMargin}}px">
+    <block >
+      <swiper-item>
+        <image src='http://www.delispring.top/wp-content/uploads/2019/05/20160204211909_34383.png' class="slide-image" mode="" />
+      </swiper-item>
+    </block>
+  </swiper>
+</view>
