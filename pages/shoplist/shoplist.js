@@ -9,7 +9,8 @@ Page({
     shoplist: [],
     page: 1,
     pagesize: 10,
-    total: 0
+    total: 0,
+    isLoading: false
 
   },
 
@@ -22,25 +23,41 @@ Page({
       }),
       this.getshopList()
   },
-  getshopList() {
-    wx.request({
-      url: `https://applet-base-api-t.itheima.net/categories/1/shops`,
-      method: "GET",
-      data: {
-        _page: this.data.page,
-        _limit: this.data.pagesize
-      },
-      success: (res) => {
-        
-        this.setData({
-          shoplist:[...this.data.shoplist,...res.data],
-          total:res.header["X-Total-Count"]-0
-          
-        })
+  getshopList(cb) {
+    //加载提示
+    wx.showLoading({
+      title: '信息加载中',
+    })
+    this.setData({
+        isLoading: true
+      }),
 
-      },
-    },
-    )
+      wx.request({
+        url: `https://applet-base-api-t.itheima.net/categories/${this.data.qury.id}/shops`,
+        method: "GET",
+        data: {
+          _page: this.data.page,
+          _limit: this.data.pagesize
+        },
+        success: (res) => {
+
+          this.setData({
+            shoplist: [...this.data.shoplist, ...res.data],
+            total: res.header["X-Total-Count"] - 0
+
+          })
+
+        },
+
+        complete: () => {
+          this.setData({
+              isLoading: false
+            }),
+
+            wx.hideLoading()
+            cb&&cb()
+        }
+      }, )
   },
 
 
@@ -78,6 +95,14 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh() {
+    this.setData({
+      shoplist:[],
+      page:1,
+      total:0
+    })
+    this.getshopList(()=>{
+      wx.stopPullDownRefresh()
+    })
 
   },
 
@@ -85,6 +110,18 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom() {
+    if (this.data.page*this.data.pagesize>=this.data.total) {
+      return wx.showToast({
+        title: '没更多了',
+        icon:"none"
+      })
+    }
+    if (this.data.isLoading) return
+    this.setData({
+      page: this.data.page + 1
+    })
+   
+    this.getshopList()
 
   },
 
